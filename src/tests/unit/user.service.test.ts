@@ -1,9 +1,26 @@
-// src/tests/unit/user.service.test.ts
-import { userService } from '../../services/user.service';
+import { Request, Response, NextFunction } from 'express';
+import { verifyToken } from '../../utils/jwt';
 
-describe('User Service', () => {
-  it('should fetch all users', async () => {
-    const users = await userService.getAllUsers();
-    expect(users).toBeInstanceOf(Array);
-  });
-});
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyToken(token);
+    req.user = decoded; // Attach user to request
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
+// Extend Express Request interface
+declare global {
+  namespace Express {
+    interface Request {
+      user?: { id: number; email: string; role: string };
+    }
+  }
+}
