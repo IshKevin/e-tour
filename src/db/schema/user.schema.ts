@@ -1,4 +1,3 @@
-// src/db/schema/user.schema.ts
 import { pgTable, uuid, varchar, boolean, timestamp, jsonb } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
