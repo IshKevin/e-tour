@@ -1,3 +1,2 @@
-console.log('====================================');
-console.log("user data");
-console.log('====================================');
+export * from '../config/database';
+export * from './schema/user.schema';
