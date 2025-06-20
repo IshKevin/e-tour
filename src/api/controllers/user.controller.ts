@@ -22,7 +22,7 @@ export const userController = {
     const users = await userService.getAllUsers();
     return successResponse(res, 200, 'Users fetched successfully', users);
   },
-
+   
   async createUser(req: Request, res: Response, next: unknown) {
     const validatedData = createUserSchema.parse(req.body);
     const user = await userService.createUser(validatedData);
