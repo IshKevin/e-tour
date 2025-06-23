@@ -25,3 +25,7 @@ E tour Group project
 - PostgreSQL (Neon)
 - Drizzle ORM
 
+## CONTRIBUTTORS
+-Isimbi
+-Ishimwe
+-paccy
