@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1750241160847,
-      "tag": "0000_eminent_wendigo",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1750338513109,
-      "tag": "0001_old_centennial",
+      "when": 1750935441853,
+      "tag": "0000_mixed_kree",
       "breakpoints": true
     }
   ]
