@@ -94,10 +94,14 @@ class SimpleHeartbeatService {
       // Get basic health status
       const health = HealthService.getBasicHealth();
       
-      // Log heartbeat if enabled
-      if (this.config.logHeartbeat) {
+      // Log heartbeat if enabled (reduce logging in production)
+      if (this.config.logHeartbeat && process.env.NODE_ENV !== 'production') {
         const uptime = this.getUptimeFormatted();
         console.log(`💓 Heartbeat #${this.heartbeatCount} | Status: ${health.status} | Uptime: ${uptime}`);
+      } else if (process.env.NODE_ENV === 'production' && this.heartbeatCount % 20 === 0) {
+        // Log every 20th heartbeat in production (every 10 minutes with 30s interval)
+        const uptime = this.getUptimeFormatted();
+        console.log(`💓 Production Heartbeat #${this.heartbeatCount} | Status: ${health.status} | Uptime: ${uptime}`);
       }
 
       // Perform self-ping if enabled
@@ -132,7 +136,9 @@ class SimpleHeartbeatService {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        console.log('🔄 Self-ping successful');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('🔄 Self-ping successful');
+        }
       } else {
         console.warn(`⚠️ Self-ping failed: HTTP ${response.status}`);
       }

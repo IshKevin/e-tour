@@ -2,10 +2,10 @@ import app from './app';
 import { env } from './config/env';
 import { simpleHeartbeatService } from './services/simple-heartbeat.service';
 
-const PORT = parseInt(env.PORT, 10);
+const PORT = parseInt(env.PORT, 10) || 3000;
 
 // Start the server
-const server = app.listen(PORT, async () => {
+const server = app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 E-Tour Backend Server started on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📅 Started at: ${new Date().toISOString()}`);
