@@ -22,5 +22,11 @@ export const users = pgTable('users', {
   statusIdx: index('users_status_idx').on(table.status)
 }));
 
+
+
+
+
+
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;

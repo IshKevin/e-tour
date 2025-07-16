@@ -14,6 +14,7 @@ export interface ActivitySuggestion {
   location: string;
   interests: string[];
   budget?: number;
+  limit?: number;
 }
 
 export const searchService = {
@@ -45,7 +46,7 @@ export const searchService = {
           averageRating: trips.averageRating,
           totalReviews: trips.totalReviews,
           images: trips.images,
-          type: 'trip' as const,
+          type: sql<string>`'trip'`,
         })
         .from(trips)
         .where(
@@ -70,7 +71,7 @@ export const searchService = {
           name: users.name,
           email: users.email,
           profileImage: users.profileImage,
-          type: 'agent' as const,
+          type: sql<string>`'agent'`,
         })
         .from(users)
         .where(
@@ -88,26 +89,13 @@ export const searchService = {
 
   // Activity suggestions based on user inputs
   async getActivitySuggestions(params: ActivitySuggestion) {
-    const { location, interests, budget } = params;
+    const { location, interests, budget, limit = 10 } = params;
 
     // This is a simplified implementation
     // In a real application, you might integrate with external APIs
     // or have a more sophisticated recommendation system
 
-    let query = db
-      .select({
-        id: trips.id,
-        title: trips.title,
-        description: trips.description,
-        location: trips.location,
-        price: trips.price,
-        startDate: trips.startDate,
-        endDate: trips.endDate,
-        averageRating: trips.averageRating,
-        images: trips.images,
-      })
-      .from(trips)
-      .where(eq(trips.status, 'active'));
+    // Build conditions for filtering
 
     const conditions = [eq(trips.status, 'active')];
 
@@ -118,13 +106,16 @@ export const searchService = {
 
     // Filter by interests (check if any interest matches description)
     if (interests && interests.length > 0) {
-      const interestConditions = interests.map(interest =>
-        or(
-          like(trips.description, `%${interest}%`),
-          like(trips.title, `%${interest}%`)
-        )
-      );
-      conditions.push(or(...interestConditions));
+      const interestConditions = interests.flatMap(interest => [
+        like(trips.description, `%${interest}%`),
+        like(trips.title, `%${interest}%`)
+      ]);
+      if (interestConditions.length > 0) {
+        const orCondition = or(...interestConditions);
+        if (orCondition) {
+          conditions.push(orCondition);
+        }
+      }
     }
 
     // Filter by budget
@@ -132,13 +123,24 @@ export const searchService = {
       conditions.push(lte(trips.price, budget.toString()));
     }
 
-    if (conditions.length > 1) {
-      query = query.where(and(...conditions));
-    }
-
-    const suggestions = await query
+    // Build the final query with all conditions
+    const suggestions = await db
+      .select({
+        id: trips.id,
+        title: trips.title,
+        description: trips.description,
+        location: trips.location,
+        price: trips.price,
+        startDate: trips.startDate,
+        endDate: trips.endDate,
+        averageRating: trips.averageRating,
+        totalReviews: trips.totalReviews,
+        images: trips.images,
+      })
+      .from(trips)
+      .where(and(...conditions))
       .orderBy(desc(trips.averageRating), desc(trips.totalReviews))
-      .limit(10);
+      .limit(limit);
 
     return suggestions;
   },

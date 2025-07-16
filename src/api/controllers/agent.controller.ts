@@ -8,7 +8,7 @@ const createTripSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   itinerary: z.string().optional(),
-  price: z.number().min(0, 'Price must be positive'),
+  price: z.union([z.number().min(0, 'Price must be positive'), z.string().min(1)]),
   maxSeats: z.number().min(1, 'At least 1 seat is required'),
   location: z.string().min(1, 'Location is required'),
   startDate: z.string().min(1, 'Start date is required'),
@@ -20,7 +20,7 @@ const updateTripSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().optional(),
   itinerary: z.string().optional(),
-  price: z.number().min(0).optional(),
+  price: z.union([z.number().min(0), z.string().min(1)]).optional(),
   maxSeats: z.number().min(1).optional(),
   location: z.string().min(1).optional(),
   startDate: z.string().optional(),
@@ -45,7 +45,8 @@ export const agentController = {
       const tripData = createTripSchema.parse(req.body);
       const trip = await agentService.createTrip(agentId, {
         ...tripData,
-        price: tripData.price.toString(),
+        price: typeof tripData.price === 'number' ? tripData.price.toString() : tripData.price,
+        availableSeats: tripData.maxSeats,
       });
       return successResponse(res, 201, 'Trip created successfully', trip);
     } catch (error) {
@@ -112,11 +113,12 @@ export const agentController = {
 
     try {
       const updateData = updateTripSchema.parse(req.body);
-      
-      // Convert price to string if provided
-      const processedData = updateData.price 
-        ? { ...updateData, price: updateData.price.toString() }
-        : updateData;
+
+      // Convert price to string if provided as number
+      const processedData: any = { ...updateData };
+      if (updateData.price !== undefined) {
+        processedData.price = typeof updateData.price === 'number' ? updateData.price.toString() : updateData.price;
+      }
 
       const updatedTrip = await agentService.updateTrip(tripId, agentId, processedData);
       return successResponse(res, 200, 'Trip updated successfully', updatedTrip);

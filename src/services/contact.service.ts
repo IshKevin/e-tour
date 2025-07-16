@@ -18,7 +18,7 @@ export const contactService = {
 
   // Get all contact messages (admin)
   async getAllContactMessages(limit: number = 50, status?: 'new' | 'in_progress' | 'resolved' | 'closed') {
-    let query = db
+    const baseQuery = db
       .select({
         id: contactMessages.id,
         userId: contactMessages.userId,
@@ -37,10 +37,13 @@ export const contactService = {
       .leftJoin(users, eq(contactMessages.userId, users.id));
 
     if (status) {
-      query = query.where(eq(contactMessages.status, status));
+      return await baseQuery
+        .where(eq(contactMessages.status, status))
+        .orderBy(desc(contactMessages.createdAt))
+        .limit(limit);
     }
 
-    return await query
+    return await baseQuery
       .orderBy(desc(contactMessages.createdAt))
       .limit(limit);
   },

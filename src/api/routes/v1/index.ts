@@ -3,6 +3,8 @@ import authRoutes from './auth.routes';
 import tripRoutes from './trip.routes';
 import agentRoutes from './agent.routes';
 import adminRoutes from './admin.routes';
+import uploadRoutes from './upload.routes';
+import healthRoutes from './health.routes';
 import { userController } from '../../controllers/user.controller';
 import { searchController } from '../../controllers/search.controller';
 import { tokenController } from '../../controllers/token.controller';
@@ -24,6 +26,12 @@ router.use('/agent', agentRoutes);
 
 // Admin routes
 router.use('/admin', adminRoutes);
+
+// Upload routes
+router.use('/upload', uploadRoutes);
+
+// Health routes
+router.use('/health', healthRoutes);
 
 // Profile routes (as specified in Task.md)
 router.get('/profile', authMiddleware, (req: Request, res: Response, next: NextFunction) => {

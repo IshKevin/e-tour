@@ -30,7 +30,7 @@ const reviewSchema = z.object({
 
 const customTripRequestSchema = z.object({
   destination: z.string().min(1, 'Destination is required'),
-  budget: z.number().min(0, 'Budget must be positive'),
+  budget: z.union([z.number().min(0, 'Budget must be positive'), z.string().min(1)]),
   interests: z.string().optional(),
   preferredStartDate: z.string().optional(),
   preferredEndDate: z.string().optional(),
@@ -159,7 +159,12 @@ export const tripController = {
     }
 
     const requestData = customTripRequestSchema.parse(req.body);
-    const customTrip = await customTripService.createCustomTripRequest(clientId, requestData);
+    // Convert budget to string if provided as number
+    const processedData = {
+      ...requestData,
+      budget: typeof requestData.budget === 'number' ? requestData.budget.toString() : requestData.budget
+    };
+    const customTrip = await customTripService.createCustomTripRequest(clientId, processedData);
     return successResponse(res, 201, 'Custom trip request submitted successfully', customTrip);
   },
 

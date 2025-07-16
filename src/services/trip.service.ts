@@ -22,7 +22,26 @@ export const tripService = {
     const { location, startDate, endDate, minPrice, maxPrice, page = 1, limit = 10 } = filters;
     const offset = (page - 1) * limit;
 
-    let query = db
+    // Apply filters
+    const conditions = [eq(trips.status, 'active')];
+
+    if (location) {
+      conditions.push(like(trips.location, `%${location}%`));
+    }
+    if (startDate) {
+      conditions.push(gte(trips.startDate, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(trips.endDate, endDate));
+    }
+    if (minPrice) {
+      conditions.push(gte(trips.price, minPrice.toString()));
+    }
+    if (maxPrice) {
+      conditions.push(lte(trips.price, maxPrice.toString()));
+    }
+
+    const query = db
       .select({
         id: trips.id,
         agentId: trips.agentId,
@@ -42,30 +61,7 @@ export const tripService = {
       })
       .from(trips)
       .leftJoin(users, eq(trips.agentId, users.id))
-      .where(eq(trips.status, 'active'));
-
-    // Apply filters
-    const conditions = [eq(trips.status, 'active')];
-    
-    if (location) {
-      conditions.push(like(trips.location, `%${location}%`));
-    }
-    if (startDate) {
-      conditions.push(gte(trips.startDate, startDate));
-    }
-    if (endDate) {
-      conditions.push(lte(trips.endDate, endDate));
-    }
-    if (minPrice) {
-      conditions.push(gte(trips.price, minPrice.toString()));
-    }
-    if (maxPrice) {
-      conditions.push(lte(trips.price, maxPrice.toString()));
-    }
-
-    if (conditions.length > 1) {
-      query = query.where(and(...conditions));
-    }
+      .where(and(...conditions));
 
     const result = await query
       .orderBy(desc(trips.createdAt))

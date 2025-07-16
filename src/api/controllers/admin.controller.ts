@@ -16,7 +16,7 @@ const updateTripSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().optional(),
   itinerary: z.string().optional(),
-  price: z.number().min(0).optional(),
+  price: z.union([z.number().min(0), z.string().min(1)]).optional(),
   maxSeats: z.number().min(1).optional(),
   location: z.string().min(1).optional(),
   startDate: z.string().optional(),
@@ -125,11 +125,12 @@ export const adminController = {
 
     try {
       const updateData = updateTripSchema.parse(req.body);
-      
-      // Convert price to string if provided
-      const processedData = updateData.price 
-        ? { ...updateData, price: updateData.price.toString() }
-        : updateData;
+
+      // Convert price to string if provided as number
+      const processedData: any = { ...updateData };
+      if (updateData.price !== undefined) {
+        processedData.price = typeof updateData.price === 'number' ? updateData.price.toString() : updateData.price;
+      }
 
       const updatedTrip = await adminService.updateTrip(tripId, processedData);
       return successResponse(res, 200, 'Trip updated successfully', updatedTrip);

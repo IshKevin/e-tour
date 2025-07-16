@@ -12,16 +12,16 @@ export const notificationService = {
 
   // Get user notifications
   async getUserNotifications(userId: number, limit: number = 50, unreadOnly: boolean = false) {
-    let query = db
-      .select()
-      .from(notifications)
-      .where(eq(notifications.userId, userId));
+    const whereConditions = [eq(notifications.userId, userId)];
 
     if (unreadOnly) {
-      query = query.where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+      whereConditions.push(eq(notifications.isRead, false));
     }
 
-    return await query
+    return await db
+      .select()
+      .from(notifications)
+      .where(and(...whereConditions))
       .orderBy(desc(notifications.createdAt))
       .limit(limit);
   },
@@ -125,8 +125,8 @@ export const notificationService = {
       metadata,
     }));
 
-    const notifications = await db.insert(notifications).values(notificationData).returning();
-    return notifications;
+    const createdNotifications = await db.insert(notifications).values(notificationData).returning();
+    return createdNotifications;
   },
 
   // Send notification to all users with specific role
