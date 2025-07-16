@@ -1,0 +1,61 @@
+# Development files
+tests/
+src/tests/
+*.test.ts
+*.spec.ts
+*.test.js
+*.spec.js
+
+# Development tools
+nodemon.json
+.env.example
+.env.local
+.env.development
+
+# Documentation
+*.md
+docs/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output/
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Build files (will be rebuilt)
+dist/
+
+# Test files
+test-*.js
+verify-*.js
+*test*.sh
