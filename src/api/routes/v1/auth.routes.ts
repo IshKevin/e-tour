@@ -24,4 +24,8 @@ router.post('/reset-password', (req: Request, res: Response, next: NextFunction)
   userController.requestPasswordReset(req, res).catch(next);
 });
 
+router.post('/reset-password/confirm', (req: Request, res: Response, next: NextFunction) => {
+  userController.resetPassword(req, res).catch(next);
+});
+
 export default router;

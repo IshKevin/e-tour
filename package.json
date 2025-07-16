@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "node --max-old-space-size=512 dist/index.js",
+    "start": "node --max-old-space-size=2048 dist/index.js",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "migrate": "npx drizzle-kit migrate",
