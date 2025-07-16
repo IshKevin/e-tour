@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node --max-old-space-size=512 dist/index.js",
     "build": "tsc",
+    "build:prod": "rm -rf dist && tsc",
     "dev": "nodemon src/index.ts",
-    "postinstall": "npm run build",
     "migrate": "npx drizzle-kit migrate",
     "generate": "npx drizzle-kit generate",
     "test": "jest",
