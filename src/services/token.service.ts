@@ -50,7 +50,7 @@ export const TOKEN_PACKAGES: TokenPackage[] = [
 
 export const tokenService = {
   // Get or create user token balance
-  async getUserTokenBalance(userId: number): Promise<Token> {
+  async getUserTokenBalance(userId: string): Promise<Token> {
     let [userTokens] = await db
       .select()
       .from(tokens)
@@ -69,7 +69,7 @@ export const tokenService = {
   },
 
   // Purchase tokens
-  async purchaseTokens(userId: number, packageId: string, paymentReference: string): Promise<{ tokens: Token; transaction: TokenTransaction }> {
+  async purchaseTokens(userId: string, packageId: string, paymentReference: string): Promise<{ tokens: Token; transaction: TokenTransaction }> {
     const tokenPackage = TOKEN_PACKAGES.find(pkg => pkg.id === packageId);
     if (!tokenPackage) {
       throw new Error('Invalid token package');
@@ -107,7 +107,7 @@ export const tokenService = {
   },
 
   // Use tokens
-  async useTokens(userId: number, amount: number, referenceId?: string, referenceType?: string, description?: string): Promise<Token> {
+  async useTokens(userId: string, amount: number, referenceId?: string, referenceType?: string, description?: string): Promise<Token> {
     const userTokens = await this.getUserTokenBalance(userId);
 
     if (userTokens.balance < amount) {
@@ -140,7 +140,7 @@ export const tokenService = {
   },
 
   // Refund tokens
-  async refundTokens(userId: number, amount: number, referenceId?: string, referenceType?: string, description?: string): Promise<Token> {
+  async refundTokens(userId: string, amount: number, referenceId?: string, referenceType?: string, description?: string): Promise<Token> {
     const userTokens = await this.getUserTokenBalance(userId);
 
     // Update token balance
@@ -169,7 +169,7 @@ export const tokenService = {
   },
 
   // Admin grant tokens
-  async grantTokens(userId: number, amount: number, description?: string): Promise<Token> {
+  async grantTokens(userId: string, amount: number, description?: string): Promise<Token> {
     const userTokens = await this.getUserTokenBalance(userId);
 
     // Update token balance
@@ -196,7 +196,7 @@ export const tokenService = {
   },
 
   // Get token transaction history
-  async getTokenHistory(userId: number, limit: number = 50) {
+  async getTokenHistory(userId: string, limit: number = 50) {
     return await db
       .select({
         id: tokenTransactions.id,

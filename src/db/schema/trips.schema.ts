@@ -1,11 +1,11 @@
-import { pgTable, serial, varchar, text, timestamp, pgEnum, integer, decimal, date, json, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, pgEnum, integer, decimal, date, json, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const tripStatusEnum = pgEnum('trip_status', ['active', 'inactive', 'deleted']);
 
 export const trips = pgTable('trips', {
-  id: serial('id').primaryKey(),
-  agentId: integer('agent_id').references(() => users.id).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  agentId: uuid('agent_id').references(() => users.id).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   itinerary: text('itinerary'),

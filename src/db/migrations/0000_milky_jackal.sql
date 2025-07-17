@@ -12,8 +12,8 @@ CREATE TYPE "public"."trip_status" AS ENUM('active', 'inactive', 'deleted');--> 
 CREATE TYPE "public"."user_role" AS ENUM('client', 'agent', 'admin');--> statement-breakpoint
 CREATE TYPE "public"."user_status" AS ENUM('active', 'suspended', 'deleted');--> statement-breakpoint
 CREATE TABLE "activity_recommendation_logs" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"destination" varchar(255) NOT NULL,
 	"budget" numeric(10, 2),
 	"interests" json,
@@ -22,8 +22,8 @@ CREATE TABLE "activity_recommendation_logs" (
 );
 --> statement-breakpoint
 CREATE TABLE "agent_performance_logs" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"agent_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"agent_id" uuid NOT NULL,
 	"total_bookings" integer DEFAULT 0 NOT NULL,
 	"total_revenue" numeric(12, 2) DEFAULT '0' NOT NULL,
 	"average_rating" numeric(3, 2) DEFAULT '0',
@@ -32,11 +32,11 @@ CREATE TABLE "agent_performance_logs" (
 );
 --> statement-breakpoint
 CREATE TABLE "audit_logs" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid,
 	"action" varchar(255) NOT NULL,
 	"table_name" varchar(100) NOT NULL,
-	"record_id" integer,
+	"record_id" varchar(36),
 	"old_values" json,
 	"new_values" json,
 	"ip_address" varchar(45),
@@ -45,9 +45,9 @@ CREATE TABLE "audit_logs" (
 );
 --> statement-breakpoint
 CREATE TABLE "bookings" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"client_id" integer NOT NULL,
-	"trip_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"client_id" uuid NOT NULL,
+	"trip_id" uuid NOT NULL,
 	"seats_booked" integer NOT NULL,
 	"total_price" numeric(10, 2) NOT NULL,
 	"status" "booking_status" DEFAULT 'pending' NOT NULL,
@@ -61,22 +61,22 @@ CREATE TABLE "bookings" (
 );
 --> statement-breakpoint
 CREATE TABLE "contact_messages" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid,
 	"name" varchar(255) NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"subject" varchar(255) NOT NULL,
 	"message" text NOT NULL,
 	"status" "message_status" DEFAULT 'new' NOT NULL,
-	"assigned_admin_id" integer,
+	"assigned_admin_id" uuid,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "custom_trip_requests" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"client_id" integer NOT NULL,
-	"assigned_agent_id" integer,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"client_id" uuid NOT NULL,
+	"assigned_agent_id" uuid,
 	"destination" varchar(255) NOT NULL,
 	"budget" numeric(10, 2) NOT NULL,
 	"interests" text,
@@ -92,8 +92,8 @@ CREATE TABLE "custom_trip_requests" (
 );
 --> statement-breakpoint
 CREATE TABLE "email_verifications" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"verification_code" varchar(10) NOT NULL,
 	"verified" boolean DEFAULT false NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -102,9 +102,9 @@ CREATE TABLE "email_verifications" (
 );
 --> statement-breakpoint
 CREATE TABLE "job_applications" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"job_id" integer NOT NULL,
-	"applicant_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"job_id" uuid NOT NULL,
+	"applicant_id" uuid NOT NULL,
 	"status" "application_status" DEFAULT 'pending' NOT NULL,
 	"cover_letter" text,
 	"portfolio_links" json,
@@ -114,9 +114,9 @@ CREATE TABLE "job_applications" (
 );
 --> statement-breakpoint
 CREATE TABLE "jobs" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"client_id" integer NOT NULL,
-	"custom_trip_id" integer,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"client_id" uuid NOT NULL,
+	"custom_trip_id" uuid,
 	"title" varchar(255) NOT NULL,
 	"description" text NOT NULL,
 	"token_cost" integer NOT NULL,
@@ -130,8 +130,8 @@ CREATE TABLE "jobs" (
 );
 --> statement-breakpoint
 CREATE TABLE "notifications" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"message" text NOT NULL,
 	"type" "notification_type" NOT NULL,
@@ -142,8 +142,8 @@ CREATE TABLE "notifications" (
 );
 --> statement-breakpoint
 CREATE TABLE "password_resets" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"token" varchar(255) NOT NULL,
 	"used" boolean DEFAULT false NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -152,10 +152,10 @@ CREATE TABLE "password_resets" (
 );
 --> statement-breakpoint
 CREATE TABLE "payments" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"reference_type" varchar(100) NOT NULL,
-	"reference_id" integer NOT NULL,
+	"reference_id" varchar(36) NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
 	"currency" varchar(3) DEFAULT 'RWF' NOT NULL,
 	"status" "payment_status_enum" DEFAULT 'pending' NOT NULL,
@@ -166,10 +166,10 @@ CREATE TABLE "payments" (
 );
 --> statement-breakpoint
 CREATE TABLE "reviews" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"client_id" integer NOT NULL,
-	"trip_id" integer NOT NULL,
-	"booking_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"client_id" uuid NOT NULL,
+	"trip_id" uuid NOT NULL,
+	"booking_id" uuid NOT NULL,
 	"rating" integer NOT NULL,
 	"comment" text,
 	"status" "review_status" DEFAULT 'active' NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE "reviews" (
 );
 --> statement-breakpoint
 CREATE TABLE "system_config" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"config_key" varchar(255) NOT NULL,
 	"config_value" json NOT NULL,
 	"description" text,
@@ -188,8 +188,8 @@ CREATE TABLE "system_config" (
 );
 --> statement-breakpoint
 CREATE TABLE "tokens" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"balance" integer DEFAULT 0 NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -197,8 +197,8 @@ CREATE TABLE "tokens" (
 );
 --> statement-breakpoint
 CREATE TABLE "token_transactions" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"type" "transaction_type" NOT NULL,
 	"amount" integer NOT NULL,
 	"cost" numeric(10, 2),
@@ -210,8 +210,8 @@ CREATE TABLE "token_transactions" (
 );
 --> statement-breakpoint
 CREATE TABLE "trips" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"agent_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"agent_id" uuid NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"description" text,
 	"itinerary" text,
@@ -231,7 +231,7 @@ CREATE TABLE "trips" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"phone" varchar(20),

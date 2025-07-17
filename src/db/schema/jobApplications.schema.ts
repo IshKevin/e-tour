@@ -1,13 +1,13 @@
-import { pgTable, serial, integer, text, timestamp, pgEnum, json, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, pgEnum, json, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 import { jobs } from './jobs.schema';
 
 export const applicationStatusEnum = pgEnum('application_status', ['pending', 'accepted', 'rejected']);
 
 export const jobApplications = pgTable('job_applications', {
-  id: serial('id').primaryKey(),
-  jobId: integer('job_id').references(() => jobs.id).notNull(),
-  applicantId: integer('applicant_id').references(() => users.id).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  jobId: uuid('job_id').references(() => jobs.id).notNull(),
+  applicantId: uuid('applicant_id').references(() => users.id).notNull(),
   status: applicationStatusEnum('status').default('pending').notNull(),
   coverLetter: text('cover_letter'),
   portfolioLinks: json('portfolio_links').$type<string[]>(),

@@ -1,11 +1,11 @@
-import { pgTable, serial, integer, decimal, varchar, text, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, integer, decimal, varchar, text, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const transactionTypeEnum = pgEnum('transaction_type', ['purchase', 'usage', 'refund', 'admin_grant']);
 
 export const tokenTransactions = pgTable('token_transactions', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
   type: transactionTypeEnum('type').notNull(),
   amount: integer('amount').notNull(),
   cost: decimal('cost', { precision: 10, scale: 2 }),

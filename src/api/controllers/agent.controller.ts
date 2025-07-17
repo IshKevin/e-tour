@@ -71,10 +71,10 @@ export const agentController = {
 
   // GET /api/agent/trips/:id - Get specific trip details
   async getAgentTripById(req: Request, res: Response): Promise<Response> {
-    const tripId = parseInt(req.params.id);
+    const tripId = req.params.id;
     const agentId = req.user?.id;
 
-    if (isNaN(tripId)) {
+    if (!tripId || typeof tripId !== 'string') {
       return res.status(400).json({ error: 'Invalid trip ID' });
     }
 
@@ -96,10 +96,10 @@ export const agentController = {
 
   // PUT /api/agent/trips/:id - Update trip
   async updateTrip(req: Request, res: Response): Promise<Response> {
-    const tripId = parseInt(req.params.id);
+    const tripId = req.params.id;
     const agentId = req.user?.id;
 
-    if (isNaN(tripId)) {
+    if (!tripId || typeof tripId !== 'string') {
       return res.status(400).json({ error: 'Invalid trip ID' });
     }
 
@@ -129,10 +129,10 @@ export const agentController = {
 
   // DELETE /api/agent/trips/:id - Soft delete trip
   async deleteTrip(req: Request, res: Response): Promise<Response> {
-    const tripId = parseInt(req.params.id);
+    const tripId = req.params.id;
     const agentId = req.user?.id;
 
-    if (isNaN(tripId)) {
+    if (!tripId || typeof tripId !== 'string') {
       return res.status(400).json({ error: 'Invalid trip ID' });
     }
 

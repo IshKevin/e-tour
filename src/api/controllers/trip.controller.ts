@@ -48,8 +48,8 @@ export const tripController = {
 
   // GET /api/trips/:id - Fetch specific trip details
   async getTripById(req: Request, res: Response): Promise<Response> {
-    const tripId = parseInt(req.params.id);
-    if (isNaN(tripId)) {
+    const tripId = req.params.id;
+    if (!tripId || typeof tripId !== 'string') {
       return res.status(400).json({ error: 'Invalid trip ID' });
     }
 
@@ -63,10 +63,10 @@ export const tripController = {
 
   // POST /api/trips/:id/book - Book a trip
   async bookTrip(req: Request, res: Response): Promise<Response> {
-    const tripId = parseInt(req.params.id);
+    const tripId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(tripId)) {
+    if (!tripId || typeof tripId !== 'string') {
       return res.status(400).json({ error: 'Invalid trip ID' });
     }
 
@@ -96,10 +96,10 @@ export const tripController = {
 
   // POST /api/bookings/:id/cancel - Cancel booking
   async cancelBooking(req: Request, res: Response): Promise<Response> {
-    const bookingId = parseInt(req.params.id);
+    const bookingId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(bookingId)) {
+    if (!bookingId || typeof bookingId !== 'string') {
       return res.status(400).json({ error: 'Invalid booking ID' });
     }
 
@@ -118,10 +118,10 @@ export const tripController = {
 
   // POST /api/trips/:id/review - Submit review
   async submitReview(req: Request, res: Response): Promise<Response> {
-    const tripId = parseInt(req.params.id);
+    const tripId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(tripId)) {
+    if (!tripId || typeof tripId !== 'string') {
       return res.status(400).json({ error: 'Invalid trip ID' });
     }
 
@@ -181,10 +181,10 @@ export const tripController = {
 
   // GET /api/custom-trips/:id - Get specific custom trip request
   async getCustomTripRequestById(req: Request, res: Response): Promise<Response> {
-    const requestId = parseInt(req.params.id);
+    const requestId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(requestId)) {
+    if (!requestId || typeof requestId !== 'string') {
       return res.status(400).json({ error: 'Invalid request ID' });
     }
 

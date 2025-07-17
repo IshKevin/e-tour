@@ -1,9 +1,9 @@
-import { pgTable, serial, integer, varchar, decimal, json, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, decimal, json, timestamp, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const activityRecommendationLogs = pgTable('activity_recommendation_logs', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
   destination: varchar('destination', { length: 255 }).notNull(),
   budget: decimal('budget', { precision: 10, scale: 2 }),
   interests: json('interests').$type<string[]>(),

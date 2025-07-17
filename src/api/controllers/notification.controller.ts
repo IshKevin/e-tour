@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 // Validation schemas
 const markAsReadSchema = z.object({
-  notificationId: z.number().min(1, 'Notification ID is required'),
+  notificationId: z.string().uuid('Invalid notification ID format'),
 });
 
 export const notificationController = {
@@ -35,8 +35,8 @@ export const notificationController = {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const notificationId = parseInt(req.params.id);
-    if (isNaN(notificationId)) {
+    const notificationId = req.params.id;
+    if (!notificationId || typeof notificationId !== 'string') {
       return res.status(400).json({ error: 'Invalid notification ID' });
     }
 
@@ -66,8 +66,8 @@ export const notificationController = {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const notificationId = parseInt(req.params.id);
-    if (isNaN(notificationId)) {
+    const notificationId = req.params.id;
+    if (!notificationId || typeof notificationId !== 'string') {
       return res.status(400).json({ error: 'Invalid notification ID' });
     }
 

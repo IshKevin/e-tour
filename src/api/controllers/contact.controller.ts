@@ -13,7 +13,7 @@ const contactMessageSchema = z.object({
 
 const updateMessageStatusSchema = z.object({
   status: z.enum(['new', 'in_progress', 'resolved', 'closed']),
-  assignedAdminId: z.number().optional(),
+  assignedAdminId: z.string().uuid('Invalid admin ID format').optional(),
 });
 
 export const contactController = {

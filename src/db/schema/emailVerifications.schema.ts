@@ -1,9 +1,9 @@
-import { pgTable, serial, integer, varchar, boolean, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, boolean, timestamp, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const emailVerifications = pgTable('email_verifications', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
   verificationCode: varchar('verification_code', { length: 10 }).notNull(),
   verified: boolean('verified').default(false).notNull(),
   expiresAt: timestamp('expires_at').notNull(),

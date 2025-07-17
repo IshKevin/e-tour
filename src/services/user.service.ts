@@ -13,7 +13,7 @@ export const userService = {
     return db.select().from(users).where(eq(users.status, 'active'));
   },
 
-  async getUserById(id: number): Promise<User | null> {
+  async getUserById(id: string): Promise<User | null> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || null;
   },
@@ -41,7 +41,7 @@ export const userService = {
     return user;
   },
 
-  async updateUser(id: number, data: Partial<User>): Promise<User | null> {
+  async updateUser(id: string, data: Partial<User>): Promise<User | null> {
     const [user] = await db
       .update(users)
       .set({ ...data, updatedAt: new Date() })
@@ -57,7 +57,7 @@ export const userService = {
     return isValid ? user : null;
   },
 
-  async updatePassword(id: number, newPassword: string): Promise<User | null> {
+  async updatePassword(id: string, newPassword: string): Promise<User | null> {
     const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
     const [updatedUser] = await db
       .update(users)
@@ -67,7 +67,7 @@ export const userService = {
     return updatedUser || null;
   },
 
-  async suspendUser(id: number): Promise<User | null> {
+  async suspendUser(id: string): Promise<User | null> {
     const [suspendedUser] = await db
       .update(users)
       .set({ status: 'suspended', updatedAt: new Date() })
@@ -77,7 +77,7 @@ export const userService = {
   },
 
   // Email verification methods
-  async createEmailVerification(userId: number): Promise<string> {
+  async createEmailVerification(userId: string): Promise<string> {
     const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
@@ -91,7 +91,7 @@ export const userService = {
     return verificationCode;
   },
 
-  async verifyEmail(userId: number, code: string): Promise<boolean> {
+  async verifyEmail(userId: string, code: string): Promise<boolean> {
     const [verification] = await db
       .select()
       .from(emailVerifications)
@@ -122,7 +122,7 @@ export const userService = {
   },
 
   // Password reset methods
-  async createPasswordReset(userId: number): Promise<string> {
+  async createPasswordReset(userId: string): Promise<string> {
     const token = uuidv4();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
@@ -136,7 +136,7 @@ export const userService = {
     return token;
   },
 
-  async verifyPasswordResetToken(token: string): Promise<number | null> {
+  async verifyPasswordResetToken(token: string): Promise<string | null> {
     const [reset] = await db
       .select()
       .from(passwordResets)

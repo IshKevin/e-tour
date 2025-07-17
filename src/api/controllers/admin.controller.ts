@@ -9,7 +9,7 @@ const suspendUserSchema = z.object({
 });
 
 const assignAgentSchema = z.object({
-  agentId: z.number().min(1, 'Agent ID is required'),
+  agentId: z.string().uuid('Invalid agent ID format'),
 });
 
 const updateTripSchema = z.object({
@@ -50,8 +50,8 @@ export const adminController = {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
+    const userId = req.params.id;
+    if (!userId || typeof userId !== 'string') {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
@@ -69,8 +69,8 @@ export const adminController = {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
+    const userId = req.params.id;
+    if (!userId || typeof userId !== 'string') {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
@@ -89,8 +89,8 @@ export const adminController = {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
+    const userId = req.params.id;
+    if (!userId || typeof userId !== 'string') {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
@@ -118,8 +118,8 @@ export const adminController = {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const tripId = parseInt(req.params.id);
-    if (isNaN(tripId)) {
+    const tripId = req.params.id;
+    if (!tripId || typeof tripId !== 'string') {
       return res.status(400).json({ error: 'Invalid trip ID' });
     }
 
@@ -165,8 +165,8 @@ export const adminController = {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const requestId = parseInt(req.params.id);
-    if (isNaN(requestId)) {
+    const requestId = req.params.id;
+    if (!requestId || typeof requestId !== 'string') {
       return res.status(400).json({ error: 'Invalid request ID' });
     }
 

@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 // Validation schemas
 const createJobSchema = z.object({
-  customTripId: z.number().optional(),
+  customTripId: z.string().uuid('Invalid custom trip ID format').optional(),
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   tokenCost: z.number().min(1, 'Token cost must be positive'),
@@ -62,10 +62,10 @@ export const jobController = {
 
   // GET /api/jobs/:id - Get job details
   async getJobById(req: Request, res: Response): Promise<Response> {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(jobId)) {
+    if (!jobId || typeof jobId !== 'string') {
       return res.status(400).json({ error: 'Invalid job ID' });
     }
 
@@ -83,10 +83,10 @@ export const jobController = {
 
   // PUT /api/jobs/:id - Update job
   async updateJob(req: Request, res: Response): Promise<Response> {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(jobId)) {
+    if (!jobId || typeof jobId !== 'string') {
       return res.status(400).json({ error: 'Invalid job ID' });
     }
 
@@ -105,10 +105,10 @@ export const jobController = {
 
   // DELETE /api/jobs/:id - Delete job
   async deleteJob(req: Request, res: Response): Promise<Response> {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(jobId)) {
+    if (!jobId || typeof jobId !== 'string') {
       return res.status(400).json({ error: 'Invalid job ID' });
     }
 
@@ -133,10 +133,10 @@ export const jobController = {
 
   // POST /api/jobs/:id/apply - Apply for job
   async applyForJob(req: Request, res: Response): Promise<Response> {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.params.id;
     const applicantId = req.user?.id;
 
-    if (isNaN(jobId)) {
+    if (!jobId || typeof jobId !== 'string') {
       return res.status(400).json({ error: 'Invalid job ID' });
     }
 
@@ -155,10 +155,10 @@ export const jobController = {
 
   // GET /api/jobs/:id/applicants - Get job applicants
   async getJobApplicants(req: Request, res: Response): Promise<Response> {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.params.id;
     const clientId = req.user?.id;
 
-    if (isNaN(jobId)) {
+    if (!jobId || typeof jobId !== 'string') {
       return res.status(400).json({ error: 'Invalid job ID' });
     }
 
@@ -176,11 +176,11 @@ export const jobController = {
 
   // POST /api/jobs/:id/applicants/:applicantId/accept - Accept applicant
   async acceptApplicant(req: Request, res: Response): Promise<Response> {
-    const jobId = parseInt(req.params.id);
-    const applicantId = parseInt(req.params.applicantId);
+    const jobId = req.params.id;
+    const applicantId = req.params.applicantId;
     const clientId = req.user?.id;
 
-    if (isNaN(jobId) || isNaN(applicantId)) {
+    if (!jobId || !applicantId || typeof jobId !== 'string' || typeof applicantId !== 'string') {
       return res.status(400).json({ error: 'Invalid job or applicant ID' });
     }
 
@@ -199,11 +199,11 @@ export const jobController = {
 
   // POST /api/jobs/:id/applicants/:applicantId/reject - Reject applicant
   async rejectApplicant(req: Request, res: Response): Promise<Response> {
-    const jobId = parseInt(req.params.id);
-    const applicantId = parseInt(req.params.applicantId);
+    const jobId = req.params.id;
+    const applicantId = req.params.applicantId;
     const clientId = req.user?.id;
 
-    if (isNaN(jobId) || isNaN(applicantId)) {
+    if (!jobId || !applicantId || typeof jobId !== 'string' || typeof applicantId !== 'string') {
       return res.status(400).json({ error: 'Invalid job or applicant ID' });
     }
 

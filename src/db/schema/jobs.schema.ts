@@ -1,13 +1,13 @@
-import { pgTable, serial, integer, varchar, text, timestamp, pgEnum, date, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, integer, varchar, text, timestamp, pgEnum, date, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 import { customTripRequests } from './customTripRequests.schema';
 
 export const jobStatusEnum = pgEnum('job_status', ['open', 'closed', 'filled']);
 
 export const jobs = pgTable('jobs', {
-  id: serial('id').primaryKey(),
-  clientId: integer('client_id').references(() => users.id).notNull(),
-  customTripId: integer('custom_trip_id').references(() => customTripRequests.id),
+  id: uuid('id').primaryKey().defaultRandom(),
+  clientId: uuid('client_id').references(() => users.id).notNull(),
+  customTripId: uuid('custom_trip_id').references(() => customTripRequests.id),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description').notNull(),
   tokenCost: integer('token_cost').notNull(),

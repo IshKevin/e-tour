@@ -6,6 +6,39 @@
 
 The application is built with **TypeScript**, **Node.js**, and an **Express** framework. The backend is integrated with a **PostgreSQL** or **Neon database**, depending on your configuration in `drizzle.config.ts`.
 
+## Database Architecture
+
+The system uses **UUID (Universally Unique Identifier)** for all primary keys instead of auto-incrementing integers, providing:
+
+- Better security (no predictable ID sequences)
+- Improved scalability for distributed systems
+- Enhanced data privacy
+- Seamless data migration and replication
+
+### UUID Implementation
+
+All database tables use UUID v4 as primary keys:
+
+```typescript
+// Example: User table with UUID
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  // ... other fields
+});
+```
+
+### API Endpoints
+
+All API endpoints expect and return UUID strings:
+
+```bash
+GET /api/users/550e8400-e29b-41d4-a716-446655440000
+POST /api/trips/6ba7b810-9dad-11d1-80b4-00c04fd430c8/book
+PUT /api/jobs/6ba7b811-9dad-11d1-80b4-00c04fd430c8
+```
+
 The **MVP** (Minimum Viable Product) is designed to provide core functionalities like booking trips, managing user profiles, and handling custom trip requests. Future versions will include payment integrations and more advanced features.
 
 ---

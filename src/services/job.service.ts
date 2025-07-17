@@ -8,7 +8,7 @@ import { eq, and, desc, ne, isNull, sql } from 'drizzle-orm';
 
 export const jobService = {
   // Create a job post
-  async createJob(clientId: number, jobData: Omit<NewJob, 'clientId'>) {
+  async createJob(clientId: string, jobData: Omit<NewJob, 'clientId'>) {
     // Check if user has enough tokens
     const userTokens = await tokenService.getUserTokenBalance(clientId);
     if (userTokens.balance < jobData.tokenCost) {
@@ -36,7 +36,7 @@ export const jobService = {
   },
 
   // Get jobs created by client
-  async getClientJobs(clientId: number) {
+  async getClientJobs(clientId: string) {
     return await db
       .select({
         id: jobs.id,
@@ -60,7 +60,7 @@ export const jobService = {
   },
 
   // Get job by ID
-  async getJobById(jobId: number, clientId?: number) {
+  async getJobById(jobId: string, clientId?: string) {
     const conditions = [eq(jobs.id, jobId), isNull(jobs.deletedAt)];
     if (clientId) {
       conditions.push(eq(jobs.clientId, clientId));
@@ -106,7 +106,7 @@ export const jobService = {
   },
 
   // Update job
-  async updateJob(jobId: number, clientId: number, updateData: Partial<Job>) {
+  async updateJob(jobId: string, clientId: string, updateData: Partial<Job>) {
     // Check if job belongs to client and is still open
     const [job] = await db
       .select()
@@ -131,7 +131,7 @@ export const jobService = {
   },
 
   // Soft delete job
-  async deleteJob(jobId: number, clientId: number) {
+  async deleteJob(jobId: string, clientId: string) {
     // Check if job belongs to client
     const [job] = await db
       .select()
@@ -198,7 +198,7 @@ export const jobService = {
   },
 
   // Apply for a job
-  async applyForJob(jobId: number, applicantId: number, applicationData: Omit<NewJobApplication, 'jobId' | 'applicantId'>) {
+  async applyForJob(jobId: string, applicantId: string, applicationData: Omit<NewJobApplication, 'jobId' | 'applicantId'>) {
     // Check if job exists and is open
     const [job] = await db
       .select()
@@ -231,7 +231,7 @@ export const jobService = {
   },
 
   // Get job applicants
-  async getJobApplicants(jobId: number, clientId: number) {
+  async getJobApplicants(jobId: string, clientId: string) {
     // Verify job belongs to client
     const [job] = await db
       .select()
@@ -264,7 +264,7 @@ export const jobService = {
   },
 
   // Accept job applicant
-  async acceptApplicant(jobId: number, applicantId: number, clientId: number, feedback?: string) {
+  async acceptApplicant(jobId: string, applicantId: string, clientId: string, feedback?: string) {
     // Verify job belongs to client
     const [job] = await db
       .select()
@@ -306,7 +306,7 @@ export const jobService = {
   },
 
   // Reject job applicant
-  async rejectApplicant(jobId: number, applicantId: number, clientId: number, feedback?: string) {
+  async rejectApplicant(jobId: string, applicantId: string, clientId: string, feedback?: string) {
     // Verify job belongs to client
     const [job] = await db
       .select()
@@ -331,7 +331,7 @@ export const jobService = {
   },
 
   // Get user's job applications
-  async getUserApplications(applicantId: number) {
+  async getUserApplications(applicantId: string) {
     return await db
       .select({
         id: jobApplications.id,

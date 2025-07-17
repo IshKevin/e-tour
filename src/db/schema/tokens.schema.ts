@@ -1,9 +1,9 @@
-import { pgTable, serial, integer, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, integer, timestamp, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const tokens = pgTable('tokens', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id).notNull().unique(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id).notNull().unique(),
   balance: integer('balance').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()

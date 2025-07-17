@@ -7,7 +7,7 @@ import { eq, and, desc, sql, sum, count } from 'drizzle-orm';
 
 export const agentService = {
   // Create a new trip
-  async createTrip(agentId: number, tripData: Omit<NewTrip, 'agentId'>) {
+  async createTrip(agentId: string, tripData: Omit<NewTrip, 'agentId'>) {
     const newTripData: NewTrip = {
       ...tripData,
       agentId,
@@ -19,7 +19,7 @@ export const agentService = {
   },
 
   // Get agent's trips
-  async getAgentTrips(agentId: number) {
+  async getAgentTrips(agentId: string) {
     return await db
       .select({
         id: trips.id,
@@ -48,7 +48,7 @@ export const agentService = {
   },
 
   // Get specific trip details for agent
-  async getAgentTripById(tripId: number, agentId: number) {
+  async getAgentTripById(tripId: string, agentId: string) {
     const [trip] = await db
       .select()
       .from(trips)
@@ -82,7 +82,7 @@ export const agentService = {
   },
 
   // Update trip (only if no bookings exist)
-  async updateTrip(tripId: number, agentId: number, updateData: Partial<Trip>) {
+  async updateTrip(tripId: string, agentId: string, updateData: Partial<Trip>) {
     // Check if trip belongs to agent
     const [trip] = await db
       .select()
@@ -118,7 +118,7 @@ export const agentService = {
   },
 
   // Soft delete trip (only if no bookings exist)
-  async deleteTrip(tripId: number, agentId: number) {
+  async deleteTrip(tripId: string, agentId: string) {
     // Check if trip belongs to agent
     const [trip] = await db
       .select()
@@ -153,7 +153,7 @@ export const agentService = {
   },
 
   // Get bookings for agent's trips
-  async getAgentBookings(agentId: number) {
+  async getAgentBookings(agentId: string) {
     return await db
       .select({
         id: bookings.id,
@@ -182,7 +182,7 @@ export const agentService = {
   },
 
   // Get agent performance metrics
-  async getAgentPerformance(agentId: number) {
+  async getAgentPerformance(agentId: string) {
     // Get total bookings and revenue
     const [bookingStats] = await db
       .select({

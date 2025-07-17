@@ -4,7 +4,6 @@ import { UploadService, upload } from '../../../services/upload.service';
 
 const router = Router();
 
-// Upload single image
 router.post('/image', authMiddleware, upload.single('image'), async (req: any, res: any) => {
   try {
     if (!req.file) {

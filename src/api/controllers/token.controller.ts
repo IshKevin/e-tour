@@ -82,7 +82,7 @@ export const tokenController = {
     }
 
     const grantTokensSchema = z.object({
-      userId: z.number().min(1, 'User ID is required'),
+      userId: z.string().uuid('Invalid user ID format'),
       amount: z.number().min(1, 'Amount must be positive'),
       description: z.string().optional(),
     });

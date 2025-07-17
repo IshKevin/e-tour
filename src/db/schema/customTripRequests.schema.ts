@@ -1,12 +1,12 @@
-import { pgTable, serial, integer, varchar, decimal, text, date, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, integer, varchar, decimal, text, date, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const customTripStatusEnum = pgEnum('custom_trip_status', ['pending', 'assigned', 'responded', 'completed', 'cancelled']);
 
 export const customTripRequests = pgTable('custom_trip_requests', {
-  id: serial('id').primaryKey(),
-  clientId: integer('client_id').references(() => users.id).notNull(),
-  assignedAgentId: integer('assigned_agent_id').references(() => users.id),
+  id: uuid('id').primaryKey().defaultRandom(),
+  clientId: uuid('client_id').references(() => users.id).notNull(),
+  assignedAgentId: uuid('assigned_agent_id').references(() => users.id),
   destination: varchar('destination', { length: 255 }).notNull(),
   budget: decimal('budget', { precision: 10, scale: 2 }).notNull(),
   interests: text('interests'),

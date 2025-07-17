@@ -1,12 +1,12 @@
-import { pgTable, serial, integer, varchar, json, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, json, timestamp, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const auditLogs = pgTable('audit_logs', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id),
   action: varchar('action', { length: 255 }).notNull(),
   tableName: varchar('table_name', { length: 100 }).notNull(),
-  recordId: integer('record_id'),
+  recordId: varchar('record_id', { length: 36 }),
   oldValues: json('old_values'),
   newValues: json('new_values'),
   ipAddress: varchar('ip_address', { length: 45 }),

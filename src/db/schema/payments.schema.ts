@@ -1,13 +1,13 @@
-import { pgTable, serial, integer, decimal, varchar, timestamp, pgEnum, json, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, decimal, varchar, timestamp, pgEnum, json, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const paymentStatusEnum = pgEnum('payment_status_enum', ['pending', 'completed', 'failed', 'refunded']);
 
 export const payments = pgTable('payments', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
   referenceType: varchar('reference_type', { length: 100 }).notNull(), // 'booking', 'tokens'
-  referenceId: integer('reference_id').notNull(),
+  referenceId: varchar('reference_id', { length: 36 }).notNull(),
   amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
   currency: varchar('currency', { length: 3 }).default('RWF').notNull(),
   status: paymentStatusEnum('status').default('pending').notNull(),

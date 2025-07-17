@@ -88,7 +88,7 @@ export const tripService = {
   },
 
   // Get trip by ID with details
-  async getTripById(id: number) {
+  async getTripById(id: string) {
     const [trip] = await db
       .select({
         id: trips.id,
@@ -160,7 +160,7 @@ export const tripService = {
   },
 
   // Book a trip
-  async bookTrip(tripId: number, clientId: number, seatsBooked: number) {
+  async bookTrip(tripId: string, clientId: string, seatsBooked: number) {
     // Check if trip exists and has available seats
     const [trip] = await db
       .select()
@@ -202,7 +202,7 @@ export const tripService = {
   },
 
   // Get user bookings
-  async getUserBookings(clientId: number) {
+  async getUserBookings(clientId: string) {
     return await db
       .select({
         id: bookings.id,
@@ -226,7 +226,7 @@ export const tripService = {
   },
 
   // Cancel booking (soft delete)
-  async cancelBooking(bookingId: number, clientId: number, reason?: string) {
+  async cancelBooking(bookingId: string, clientId: string, reason?: string) {
     const [booking] = await db
       .select()
       .from(bookings)

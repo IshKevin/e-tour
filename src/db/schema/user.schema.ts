@@ -1,10 +1,10 @@
-import { pgTable, serial, varchar, text, timestamp, pgEnum, boolean, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, pgEnum, boolean, index } from 'drizzle-orm/pg-core';
 
 export const userRoleEnum = pgEnum('user_role', ['client', 'agent', 'admin']);
 export const userStatusEnum = pgEnum('user_status', ['active', 'suspended', 'deleted']);
 
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   phone: varchar('phone', { length: 20 }),

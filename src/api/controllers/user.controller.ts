@@ -20,7 +20,7 @@ const loginSchema = z.object({
 });
 
 const verifyEmailSchema = z.object({
-  userId: z.number(),
+  userId: z.string().uuid('Invalid user ID format'),
   code: z.string().min(6, 'Verification code must be 6 characters'),
 });
 
@@ -62,7 +62,7 @@ export const userController = {
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = generateToken({ id: Number(user.id), email: user.email, role: user.role });
+    const token = generateToken({ id: user.id, email: user.email, role: user.role });
     return successResponse(res, 200, 'Login successful', {
       id: user.id,
       name: user.name,

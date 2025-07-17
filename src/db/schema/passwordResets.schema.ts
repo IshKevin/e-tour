@@ -1,9 +1,9 @@
-import { pgTable, serial, integer, varchar, boolean, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, boolean, timestamp, index } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 
 export const passwordResets = pgTable('password_resets', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
   token: varchar('token', { length: 255 }).notNull().unique(),
   used: boolean('used').default(false).notNull(),
   expiresAt: timestamp('expires_at').notNull(),

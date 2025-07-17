@@ -1,7 +1,7 @@
-import { pgTable, serial, varchar, json, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, json, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const systemConfig = pgTable('system_config', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   configKey: varchar('config_key', { length: 255 }).notNull().unique(),
   configValue: json('config_value').notNull(),
   description: text('description'),
