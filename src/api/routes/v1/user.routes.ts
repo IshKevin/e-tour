@@ -13,4 +13,14 @@ router.put('/profile', authMiddleware, (req: Request, res: Response, next: NextF
   userController.updateProfile(req, res).catch(next);
 });
 
+// Terms and conditions agreement
+router.put('/terms-agreement', authMiddleware, (req: Request, res: Response, next: NextFunction) => {
+  userController.updateTermsAgreement(req, res).catch(next);
+});
+
+// Notification preferences
+router.put('/notification-preferences', authMiddleware, (req: Request, res: Response, next: NextFunction) => {
+  userController.updateNotificationPreference(req, res).catch(next);
+});
+
 export default router;

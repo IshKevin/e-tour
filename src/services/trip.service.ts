@@ -265,7 +265,7 @@ export const tripService = {
   },
 
   // Submit review for completed trip
-  async submitReview(clientId: number, tripId: number, bookingId: number, rating: number, comment?: string) {
+  async submitReview(clientId: string, tripId: string, bookingId: string, rating: number, comment?: string) {
     // Check if booking exists and is completed
     const [booking] = await db
       .select()

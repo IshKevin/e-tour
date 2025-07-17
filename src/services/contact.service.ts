@@ -49,7 +49,7 @@ export const contactService = {
   },
 
   // Get contact message by ID
-  async getContactMessageById(messageId: number): Promise<ContactMessage | null> {
+  async getContactMessageById(messageId: string): Promise<ContactMessage | null> {
     const [message] = await db
       .select()
       .from(contactMessages)
@@ -59,7 +59,7 @@ export const contactService = {
   },
 
   // Update contact message status
-  async updateMessageStatus(messageId: number, status: 'new' | 'in_progress' | 'resolved' | 'closed', assignedAdminId?: number): Promise<ContactMessage | null> {
+  async updateMessageStatus(messageId: string, status: 'new' | 'in_progress' | 'resolved' | 'closed', assignedAdminId?: string): Promise<ContactMessage | null> {
     const updateData: any = {
       status,
       updatedAt: new Date(),
@@ -79,7 +79,7 @@ export const contactService = {
   },
 
   // Assign message to admin
-  async assignMessageToAdmin(messageId: number, adminId: number): Promise<ContactMessage | null> {
+  async assignMessageToAdmin(messageId: string, adminId: string): Promise<ContactMessage | null> {
     const [updatedMessage] = await db
       .update(contactMessages)
       .set({
@@ -94,7 +94,7 @@ export const contactService = {
   },
 
   // Get messages assigned to admin
-  async getAdminAssignedMessages(adminId: number, limit: number = 50) {
+  async getAdminAssignedMessages(adminId: string, limit: number = 50) {
     return await db
       .select({
         id: contactMessages.id,
