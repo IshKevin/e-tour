@@ -25,7 +25,7 @@ export const adminService = {
   },
 
   // Get user by ID with detailed info
-  async getUserById(userId: number) {
+  async getUserById(userId: string) {
     const [user] = await db
       .select()
       .from(users)
@@ -70,7 +70,7 @@ export const adminService = {
   },
 
   // Suspend user
-  async suspendUser(userId: number, reason?: string) {
+  async suspendUser(userId: string, reason?: string) {
     const [suspendedUser] = await db
       .update(users)
       .set({ 
@@ -87,7 +87,7 @@ export const adminService = {
   },
 
   // Reactivate user
-  async reactivateUser(userId: number) {
+  async reactivateUser(userId: string) {
     const [reactivatedUser] = await db
       .update(users)
       .set({ 
@@ -131,7 +131,7 @@ export const adminService = {
   },
 
   // Update trip (admin can override agent restrictions)
-  async updateTrip(tripId: number, updateData: Partial<typeof trips.$inferSelect>) {
+  async updateTrip(tripId: string, updateData: Partial<typeof trips.$inferSelect>) {
     const [updatedTrip] = await db
       .update(trips)
       .set({ ...updateData, updatedAt: new Date() })
@@ -194,7 +194,7 @@ export const adminService = {
   },
 
   // Assign agent to custom trip request
-  async assignAgentToCustomTrip(requestId: number, agentId: number) {
+  async assignAgentToCustomTrip(requestId: string, agentId: string) {
     // Verify agent exists and has agent role
     const [agent] = await db
       .select()

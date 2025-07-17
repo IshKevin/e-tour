@@ -11,7 +11,7 @@ export const notificationService = {
   },
 
   // Get user notifications
-  async getUserNotifications(userId: number, limit: number = 50, unreadOnly: boolean = false) {
+  async getUserNotifications(userId: string, limit: number = 50, unreadOnly: boolean = false) {
     const whereConditions = [eq(notifications.userId, userId)];
 
     if (unreadOnly) {
@@ -27,7 +27,7 @@ export const notificationService = {
   },
 
   // Mark notification as read
-  async markAsRead(notificationId: number, userId: number): Promise<Notification | null> {
+  async markAsRead(notificationId: string, userId: string): Promise<Notification | null> {
     const [notification] = await db
       .update(notifications)
       .set({ 
@@ -41,7 +41,7 @@ export const notificationService = {
   },
 
   // Mark all notifications as read for user
-  async markAllAsRead(userId: number): Promise<number> {
+  async markAllAsRead(userId: string): Promise<number> {
     const result = await db
       .update(notifications)
       .set({ 
@@ -55,7 +55,7 @@ export const notificationService = {
   },
 
   // Get unread notification count
-  async getUnreadCount(userId: number): Promise<number> {
+  async getUnreadCount(userId: string): Promise<number> {
     const [result] = await db
       .select({ count: sql<number>`COUNT(*)` })
       .from(notifications)
@@ -65,7 +65,7 @@ export const notificationService = {
   },
 
   // Delete notification
-  async deleteNotification(notificationId: number, userId: number): Promise<boolean> {
+  async deleteNotification(notificationId: string, userId: string): Promise<boolean> {
     const result = await db
       .delete(notifications)
       .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId)))
@@ -75,7 +75,7 @@ export const notificationService = {
   },
 
   // Helper methods for creating specific types of notifications
-  async createBookingNotification(userId: number, title: string, message: string, metadata?: any) {
+  async createBookingNotification(userId: string, title: string, message: string, metadata?: any) {
     return this.createNotification({
       userId,
       title,
@@ -85,7 +85,7 @@ export const notificationService = {
     });
   },
 
-  async createCancellationNotification(userId: number, title: string, message: string, metadata?: any) {
+  async createCancellationNotification(userId: string, title: string, message: string, metadata?: any) {
     return this.createNotification({
       userId,
       title,
@@ -95,7 +95,7 @@ export const notificationService = {
     });
   },
 
-  async createJobUpdateNotification(userId: number, title: string, message: string, metadata?: any) {
+  async createJobUpdateNotification(userId: string, title: string, message: string, metadata?: any) {
     return this.createNotification({
       userId,
       title,
@@ -105,7 +105,7 @@ export const notificationService = {
     });
   },
 
-  async createSystemNotification(userId: number, title: string, message: string, metadata?: any) {
+  async createSystemNotification(userId: string, title: string, message: string, metadata?: any) {
     return this.createNotification({
       userId,
       title,
@@ -116,7 +116,7 @@ export const notificationService = {
   },
 
   // Broadcast notification to multiple users
-  async broadcastNotification(userIds: number[], title: string, message: string, type: 'booking' | 'cancellation' | 'job_update' | 'system', metadata?: any) {
+  async broadcastNotification(userIds: string[], title: string, message: string, type: 'booking' | 'cancellation' | 'job_update' | 'system', metadata?: any) {
     const notificationData = userIds.map(userId => ({
       userId,
       title,

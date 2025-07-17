@@ -183,7 +183,7 @@ export class EmailService {
             <p>Your verification code is:</p>
             <div class="code">${code}</div>
             <p>Please enter this code in the verification form to activate your account.</p>
-            <p><strong>Note:</strong> This code will expire in 10 minutes for security reasons.</p>
+            <p><strong>Note:</strong> This code will expire in 24 hours for security reasons.</p>
           </div>
           <div class="footer">
             <p>If you didn't request this verification, please ignore this email.</p>

@@ -39,6 +39,36 @@ POST /api/trips/6ba7b810-9dad-11d1-80b4-00c04fd430c8/book
 PUT /api/jobs/6ba7b811-9dad-11d1-80b4-00c04fd430c8
 ```
 
+## Enhanced User Schema
+
+The user schema includes comprehensive profile fields for better user experience:
+
+### Core User Fields
+- **UUID Primary Key**: Secure, non-sequential identification
+- **Authentication**: Email/password with role-based access
+- **Profile**: Name, email, phone, profile image
+
+### Optional Business Fields
+- **Company Name**: For business users and travel agents
+- **Location**: User's location for location-based services
+- **Notification Preferences**: Granular control over communications
+- **Terms Agreement**: Compliance tracking with timestamps
+
+### Example User Object
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "role": "client",
+  "companyName": "Rwanda Tours Ltd",
+  "location": "Kigali, Rwanda",
+  "notificationsEnabled": true,
+  "agreedToTerms": true,
+  "termsAgreedAt": "2024-01-15T10:30:00Z"
+}
+```
+
 The **MVP** (Minimum Viable Product) is designed to provide core functionalities like booking trips, managing user profiles, and handling custom trip requests. Future versions will include payment integrations and more advanced features.
 
 ---

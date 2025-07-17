@@ -26,6 +26,7 @@ const cancelBookingSchema = z.object({
 const reviewSchema = z.object({
   rating: z.number().min(1).max(5, 'Rating must be between 1 and 5'),
   comment: z.string().optional(),
+  bookingId: z.string().uuid('Invalid booking ID format'),
 });
 
 const customTripRequestSchema = z.object({
@@ -130,10 +131,9 @@ export const tripController = {
     }
 
     try {
-      const { rating, comment } = reviewSchema.parse(req.body);
-      const bookingId = parseInt(req.body.bookingId);
-      
-      if (isNaN(bookingId)) {
+      const { rating, comment, bookingId } = reviewSchema.parse(req.body);
+
+      if (!bookingId || typeof bookingId !== 'string') {
         return res.status(400).json({ error: 'Invalid booking ID' });
       }
 

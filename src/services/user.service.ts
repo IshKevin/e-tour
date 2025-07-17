@@ -29,13 +29,20 @@ export const userService = {
     password: string;
     role?: 'client' | 'agent' | 'admin';
     phone?: string;
+    companyName?: string;
+    location?: string;
+    notificationsEnabled?: boolean;
+    agreedToTerms?: boolean;
   }): Promise<User> {
-    const { password, ...rest } = data;
+    const { password, agreedToTerms, ...rest } = data;
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const newUser: NewUser = {
       ...rest,
       passwordHash,
       role: data.role ?? 'client',
+      agreedToTerms: agreedToTerms ?? false,
+      termsAgreedAt: agreedToTerms ? new Date() : undefined,
+      notificationsEnabled: data.notificationsEnabled ?? true,
     };
     const [user] = await db.insert(users).values(newUser).returning();
     return user;
@@ -45,6 +52,33 @@ export const userService = {
     const [user] = await db
       .update(users)
       .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user || null;
+  },
+
+  async updateTermsAgreement(id: string, agreed: boolean): Promise<User | null> {
+    const updateData: Partial<User> = {
+      agreedToTerms: agreed,
+      termsAgreedAt: agreed ? new Date() : null,
+      updatedAt: new Date(),
+    };
+
+    const [user] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning();
+    return user || null;
+  },
+
+  async updateNotificationPreference(id: string, enabled: boolean): Promise<User | null> {
+    const [user] = await db
+      .update(users)
+      .set({
+        notificationsEnabled: enabled,
+        updatedAt: new Date()
+      })
       .where(eq(users.id, id))
       .returning();
     return user || null;
@@ -78,8 +112,29 @@ export const userService = {
 
   // Email verification methods
   async createEmailVerification(userId: string): Promise<string> {
-    const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    console.log(`📧 Creating email verification for userId: ${userId}`);
+
+    // Invalidate any existing unverified codes for this user
+    const invalidatedResult = await db
+      .update(emailVerifications)
+      .set({ verified: true, verifiedAt: new Date() })
+      .where(
+        and(
+          eq(emailVerifications.userId, userId),
+          eq(emailVerifications.verified, false)
+        )
+      )
+      .returning();
+
+    if (invalidatedResult.length > 0) {
+      console.log(`🔄 Invalidated ${invalidatedResult.length} existing verification codes for user ${userId}`);
+    }
+
+    // Generate a proper 6-character alphanumeric code
+    const verificationCode = this.generateVerificationCode();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    console.log(`🔑 Generated verification code: ${verificationCode}, expires at: ${expiresAt}`);
 
     const verificationData: NewEmailVerification = {
       userId,
@@ -87,11 +142,39 @@ export const userService = {
       expiresAt,
     };
 
-    await db.insert(emailVerifications).values(verificationData);
+    const [insertedVerification] = await db.insert(emailVerifications).values(verificationData).returning();
+    console.log(`✅ Verification record created with ID: ${insertedVerification.id}`);
+
     return verificationCode;
   },
 
+  // Helper method to generate a proper 6-character verification code
+  generateVerificationCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+
   async verifyEmail(userId: string, code: string): Promise<boolean> {
+    console.log(`🔍 Verifying email for userId: ${userId}, code: ${code}`);
+
+    // First, let's check all verification records for this user for debugging
+    const allVerifications = await db
+      .select()
+      .from(emailVerifications)
+      .where(eq(emailVerifications.userId, userId));
+
+    console.log(`📋 All verification records for user ${userId}:`, allVerifications.map(v => ({
+      id: v.id,
+      code: v.verificationCode,
+      verified: v.verified,
+      expiresAt: v.expiresAt,
+      createdAt: v.createdAt
+    })));
+
     const [verification] = await db
       .select()
       .from(emailVerifications)
@@ -104,7 +187,16 @@ export const userService = {
         )
       );
 
-    if (!verification) return false;
+    if (!verification) {
+      console.log(`❌ No valid verification found for userId: ${userId}, code: ${code}`);
+      return false;
+    }
+
+    console.log(`✅ Valid verification found:`, {
+      id: verification.id,
+      code: verification.verificationCode,
+      expiresAt: verification.expiresAt
+    });
 
     // Mark verification as used
     await db
@@ -118,6 +210,7 @@ export const userService = {
       .set({ emailVerified: true, updatedAt: new Date() })
       .where(eq(users.id, userId));
 
+    console.log(`🎉 Email verification successful for userId: ${userId}`);
     return true;
   },
 

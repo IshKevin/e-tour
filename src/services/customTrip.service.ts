@@ -5,7 +5,7 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 
 export const customTripService = {
   // Submit a custom trip request
-  async createCustomTripRequest(clientId: number, requestData: Omit<NewCustomTripRequest, 'clientId'>) {
+  async createCustomTripRequest(clientId: string, requestData: Omit<NewCustomTripRequest, 'clientId'>) {
     const customTripData: NewCustomTripRequest = {
       clientId,
       ...requestData,
@@ -16,7 +16,7 @@ export const customTripService = {
   },
 
   // Get all custom trip requests for a client
-  async getClientCustomTripRequests(clientId: number) {
+  async getClientCustomTripRequests(clientId: string) {
     return await db
       .select({
         id: customTripRequests.id,
@@ -42,7 +42,7 @@ export const customTripService = {
   },
 
   // Get custom trip request by ID
-  async getCustomTripRequestById(id: number, clientId?: number) {
+  async getCustomTripRequestById(id: string, clientId?: string) {
     const conditions = [eq(customTripRequests.id, id)];
     if (clientId) {
       conditions.push(eq(customTripRequests.clientId, clientId));
@@ -108,7 +108,7 @@ export const customTripService = {
   },
 
   // Assign agent to custom trip request (admin function)
-  async assignAgentToCustomTrip(requestId: number, agentId: number) {
+  async assignAgentToCustomTrip(requestId: string, agentId: string) {
     const [updatedRequest] = await db
       .update(customTripRequests)
       .set({
@@ -123,7 +123,7 @@ export const customTripService = {
   },
 
   // Update custom trip request status
-  async updateCustomTripStatus(requestId: number, status: 'pending' | 'assigned' | 'responded' | 'completed' | 'cancelled', agentResponse?: string, quotedPrice?: string) {
+  async updateCustomTripStatus(requestId: string, status: 'pending' | 'assigned' | 'responded' | 'completed' | 'cancelled', agentResponse?: string, quotedPrice?: string) {
     const updateData: any = {
       status,
       updatedAt: new Date(),

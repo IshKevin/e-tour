@@ -12,6 +12,11 @@ export const users = pgTable('users', {
   role: userRoleEnum('role').default('client').notNull(),
   status: userStatusEnum('status').default('active').notNull(),
   profileImage: text('profile_image'),
+  companyName: varchar('company_name', { length: 255 }),
+  location: varchar('location', { length: 255 }),
+  notificationsEnabled: boolean('notifications_enabled').default(true).notNull(),
+  agreedToTerms: boolean('agreed_to_terms').default(false).notNull(),
+  termsAgreedAt: timestamp('terms_agreed_at'),
   emailVerified: boolean('email_verified').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -19,7 +24,9 @@ export const users = pgTable('users', {
 }, (table) => ({
   emailIdx: index('users_email_idx').on(table.email),
   roleIdx: index('users_role_idx').on(table.role),
-  statusIdx: index('users_status_idx').on(table.status)
+  statusIdx: index('users_status_idx').on(table.status),
+  locationIdx: index('users_location_idx').on(table.location),
+  companyIdx: index('users_company_idx').on(table.companyName)
 }));
 
 
