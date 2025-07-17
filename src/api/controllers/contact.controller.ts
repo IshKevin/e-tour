@@ -17,13 +17,12 @@ const updateMessageStatusSchema = z.object({
 });
 
 export const contactController = {
-  // POST /api/contact - Submit contact message
   async submitContactMessage(req: Request, res: Response): Promise<Response> {
     try {
       const { name, email, subject, message } = contactMessageSchema.parse(req.body);
       
       const messageData = {
-        userId: req.user?.id || null, // Optional - can be submitted by non-authenticated users
+        userId: req.user?.id || null,
         name,
         email,
         subject,
@@ -37,8 +36,7 @@ export const contactController = {
     }
   },
 
-  // Admin endpoints
-  // GET /api/admin/contact-messages - Get all contact messages (admin only)
+  
   async getAllContactMessages(req: Request, res: Response): Promise<Response> {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
@@ -51,14 +49,14 @@ export const contactController = {
     return successResponse(res, 200, 'Contact messages fetched successfully', messages);
   },
 
-  // GET /api/admin/contact-messages/:id - Get contact message by ID (admin only)
+  
   async getContactMessageById(req: Request, res: Response): Promise<Response> {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const messageId = parseInt(req.params.id);
-    if (isNaN(messageId)) {
+    const messageId = req.params.id;
+    if (!messageId || typeof messageId !== 'string') {
       return res.status(400).json({ error: 'Invalid message ID' });
     }
 
@@ -70,14 +68,14 @@ export const contactController = {
     return successResponse(res, 200, 'Contact message fetched successfully', message);
   },
 
-  // PUT /api/admin/contact-messages/:id/status - Update message status (admin only)
+
   async updateMessageStatus(req: Request, res: Response): Promise<Response> {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const messageId = parseInt(req.params.id);
-    if (isNaN(messageId)) {
+    const messageId = req.params.id;
+    if (!messageId || typeof messageId !== 'string') {
       return res.status(400).json({ error: 'Invalid message ID' });
     }
 
@@ -95,16 +93,16 @@ export const contactController = {
     }
   },
 
-  // POST /api/admin/contact-messages/:id/assign - Assign message to admin
+ 
   async assignMessageToAdmin(req: Request, res: Response): Promise<Response> {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
     }
 
-    const messageId = parseInt(req.params.id);
+    const messageId = req.params.id;
     const adminId = req.user?.id;
 
-    if (isNaN(messageId)) {
+    if (!messageId || typeof messageId !== 'string') {
       return res.status(400).json({ error: 'Invalid message ID' });
     }
 
@@ -120,7 +118,7 @@ export const contactController = {
     return successResponse(res, 200, 'Message assigned successfully', updatedMessage);
   },
 
-  // GET /api/admin/my-assigned-messages - Get messages assigned to current admin
+
   async getMyAssignedMessages(req: Request, res: Response): Promise<Response> {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
@@ -136,7 +134,7 @@ export const contactController = {
     return successResponse(res, 200, 'Assigned messages fetched successfully', messages);
   },
 
-  // GET /api/admin/contact-stats - Get contact message statistics (admin only)
+  
   async getContactMessageStats(req: Request, res: Response): Promise<Response> {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });
@@ -146,7 +144,7 @@ export const contactController = {
     return successResponse(res, 200, 'Contact message statistics fetched successfully', stats);
   },
 
-  // GET /api/admin/contact-messages/search - Search contact messages (admin only)
+  
   async searchContactMessages(req: Request, res: Response): Promise<Response> {
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admin role required.' });

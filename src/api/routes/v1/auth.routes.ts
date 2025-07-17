@@ -3,7 +3,6 @@ import { userController } from '../../controllers/user.controller';
 
 const router = Router();
 
-// Authentication routes as specified in Task.md
 router.post('/register', (req: Request, res: Response, next: NextFunction) => {
   userController.createUser(req, res, next).catch(next);
 });
@@ -18,6 +17,10 @@ router.post('/logout', (req: Request, res: Response, next: NextFunction) => {
 
 router.post('/verify-email', (req: Request, res: Response, next: NextFunction) => {
   userController.verifyEmail(req, res).catch(next);
+});
+
+router.post('/resend-verification', (req: Request, res: Response, next: NextFunction) => {
+  userController.resendVerificationEmail(req, res).catch(next);
 });
 
 router.post('/reset-password', (req: Request, res: Response, next: NextFunction) => {
