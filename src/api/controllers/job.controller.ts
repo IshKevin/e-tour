@@ -1,51 +1,133 @@
 import { Request, Response } from 'express';
 import { jobService } from '../../services/job.service';
-import { successResponse } from '../../utils/response';
+import {
+  successResponse,
+  errorResponse,
+  validationErrorResponse,
+  jobSuccessResponse
+} from '../../utils/response';
 import { z } from 'zod';
 
-// Validation schemas
+// Enhanced validation schemas
 const createJobSchema = z.object({
   customTripId: z.string().uuid('Invalid custom trip ID format').optional(),
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
-  tokenCost: z.number().min(1, 'Token cost must be positive'),
-  category: z.string().optional(),
-  location: z.string().optional(),
-  applicationDeadline: z.string().optional(),
+  title: z.string().min(1, 'Title is required').max(255, 'Title cannot exceed 255 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters').max(2000, 'Description cannot exceed 2000 characters'),
+  tokenCost: z.coerce.number().min(1, 'Token cost must be at least 1').max(1000, 'Token cost cannot exceed 1000'),
+  category: z.string().max(100, 'Category cannot exceed 100 characters').optional(),
+  location: z.string().max(255, 'Location cannot exceed 255 characters').optional(),
+  applicationDeadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Application deadline must be in YYYY-MM-DD format').optional(),
+  requirements: z.array(z.string().max(200, 'Each requirement cannot exceed 200 characters')).max(10, 'Maximum 10 requirements allowed').optional(),
+  skills: z.array(z.string().max(50, 'Each skill cannot exceed 50 characters')).max(20, 'Maximum 20 skills allowed').optional()
 });
 
 const updateJobSchema = z.object({
-  title: z.string().min(1).optional(),
-  description: z.string().min(1).optional(),
-  category: z.string().optional(),
-  location: z.string().optional(),
-  applicationDeadline: z.string().optional(),
-  status: z.enum(['open', 'closed']).optional(),
+  title: z.string().min(1, 'Title cannot be empty').max(255, 'Title cannot exceed 255 characters').optional(),
+  description: z.string().min(10, 'Description must be at least 10 characters').max(2000, 'Description cannot exceed 2000 characters').optional(),
+  category: z.string().max(100, 'Category cannot exceed 100 characters').optional(),
+  location: z.string().max(255, 'Location cannot exceed 255 characters').optional(),
+  applicationDeadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Application deadline must be in YYYY-MM-DD format').optional(),
+  status: z.enum(['open', 'closed'], { errorMap: () => ({ message: 'Status must be either open or closed' }) }).optional(),
+  requirements: z.array(z.string().max(200, 'Each requirement cannot exceed 200 characters')).max(10, 'Maximum 10 requirements allowed').optional(),
+  skills: z.array(z.string().max(50, 'Each skill cannot exceed 50 characters')).max(20, 'Maximum 20 skills allowed').optional()
 });
 
 const jobApplicationSchema = z.object({
-  coverLetter: z.string().optional(),
-  portfolioLinks: z.array(z.string()).optional(),
+  coverLetter: z.string().max(1000, 'Cover letter cannot exceed 1000 characters').optional(),
+  portfolioLinks: z.array(z.string().url('Each portfolio link must be a valid URL')).max(5, 'Maximum 5 portfolio links allowed').optional(),
+  expectedRate: z.coerce.number().min(0, 'Expected rate must be positive').optional(),
+  availability: z.enum(['immediate', 'within_week', 'within_month', 'flexible']).optional()
 });
 
 const applicantActionSchema = z.object({
-  feedback: z.string().optional(),
+  feedback: z.string().max(500, 'Feedback cannot exceed 500 characters').optional(),
+  rating: z.coerce.number().min(1, 'Rating must be at least 1').max(5, 'Rating cannot exceed 5').optional()
 });
 
 export const jobController = {
   // POST /api/jobs - Create job post
   async createJob(req: Request, res: Response): Promise<Response> {
-    const clientId = req.user?.id;
-    if (!clientId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
     try {
+      const clientId = req.user?.id;
+      if (!clientId) {
+        return errorResponse(
+          res,
+          401,
+          'Authentication is required to create a job posting. Please log in and try again.',
+          null,
+          { action: 'login_required', endpoint: '/api/v1/auth/login' }
+        );
+      }
+
       const jobData = createJobSchema.parse(req.body);
+
+      // Validate application deadline if provided
+      if (jobData.applicationDeadline) {
+        const deadlineDate = new Date(jobData.applicationDeadline);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (deadlineDate <= today) {
+          return errorResponse(
+            res,
+            400,
+            'Application deadline must be in the future',
+            null,
+            { field: 'applicationDeadline', received: jobData.applicationDeadline }
+          );
+        }
+      }
+
       const job = await jobService.createJob(clientId, jobData);
-      return successResponse(res, 201, 'Job created successfully', job);
+
+      // Enhanced job creation response
+      const enhancedJob = {
+        ...job,
+        jobInfo: {
+          status: 'open',
+          visibility: 'public',
+          canEdit: true,
+          canDelete: true
+        },
+        applicationInfo: {
+          totalApplications: 0,
+          deadline: jobData.applicationDeadline || 'No deadline set',
+          estimatedCost: `${jobData.tokenCost} tokens`
+        },
+        nextSteps: [
+          'Your job posting is now live and visible to freelancers',
+          'You will receive notifications when freelancers apply',
+          'Review applications and select the best candidate'
+        ]
+      };
+
+      return jobSuccessResponse(
+        res,
+        201,
+        'Job posting created successfully! Your job is now live and visible to freelancers.',
+        enhancedJob,
+        { operation: 'create_job' }
+      );
     } catch (error) {
-      return res.status(400).json({ error: (error as Error).message });
+      if (error instanceof z.ZodError) {
+        return validationErrorResponse(
+          res,
+          'The job posting information provided is invalid. Please check your input and try again.',
+          error.errors
+        );
+      }
+      console.error('Error creating job:', error);
+      return errorResponse(
+        res,
+        500,
+        'Unable to create job posting at this time. Please try again later.',
+        error,
+        {
+          operation: 'create_job',
+          clientId: req.user?.id,
+          suggestion: 'Please try again or contact support if the issue persists'
+        }
+      );
     }
   },
 
