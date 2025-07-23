@@ -14,6 +14,7 @@ export interface ResponseMeta {
   requestId?: string;
   version?: string;
   service?: string;
+  operation?: string;
   pagination?: PaginationMeta;
   filters?: Record<string, any>;
   sort?: Record<string, any>;
@@ -206,7 +207,7 @@ function getErrorCode(status: number): string {
   return errorCodes[status] || 'UNKNOWN_ERROR';
 }
 
-// Trip-specific response helpers
+// Service-specific response helpers
 export const tripSuccessResponse = (
   res: Response,
   status: number,
@@ -218,6 +219,111 @@ export const tripSuccessResponse = (
     ...meta,
     version: 'v1',
     service: 'trip-service'
+  });
+};
+
+// Admin-specific responses
+export const adminSuccessResponse = (
+  res: Response,
+  status: number,
+  message: string,
+  data: any,
+  operation?: string
+) => {
+  return successResponse(res, status, message, data, {
+    version: 'v1',
+    service: 'admin-service',
+    operation
+  });
+};
+
+// Job marketplace responses
+export const jobSuccessResponse = (
+  res: Response,
+  status: number,
+  message: string,
+  data: any,
+  meta?: Partial<ResponseMeta>
+) => {
+  return successResponse(res, status, message, data, {
+    ...meta,
+    version: 'v1',
+    service: 'job-service'
+  });
+};
+
+// Token system responses
+export const tokenSuccessResponse = (
+  res: Response,
+  status: number,
+  message: string,
+  data: any,
+  transactionInfo?: Record<string, any>
+) => {
+  const enhancedData = transactionInfo ? {
+    ...data,
+    transactionInfo
+  } : data;
+
+  return successResponse(res, status, message, enhancedData, {
+    version: 'v1',
+    service: 'token-service'
+  });
+};
+
+// Contact system responses
+export const contactSuccessResponse = (
+  res: Response,
+  status: number,
+  message: string,
+  data: any
+) => {
+  return successResponse(res, status, message, {
+    ...data,
+    supportInfo: {
+      message: 'We will respond to your message within 24 hours',
+      expectedResponseTime: '24 hours',
+      supportEmail: 'support@etour-rwanda.com'
+    }
+  }, {
+    version: 'v1',
+    service: 'contact-service'
+  });
+};
+
+// Search system responses
+export const searchSuccessResponse = (
+  res: Response,
+  status: number,
+  message: string,
+  data: any,
+  searchMeta?: Record<string, any>
+) => {
+  return successResponse(res, status, message, data, {
+    version: 'v1',
+    service: 'search-service',
+    ...searchMeta
+  });
+};
+
+// Upload system responses
+export const uploadSuccessResponse = (
+  res: Response,
+  status: number,
+  message: string,
+  data: any,
+  uploadMeta?: Record<string, any>
+) => {
+  return successResponse(res, status, message, {
+    ...data,
+    uploadInfo: {
+      maxFileSize: '10MB',
+      allowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+      ...uploadMeta
+    }
+  }, {
+    version: 'v1',
+    service: 'upload-service'
   });
 };
 
