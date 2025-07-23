@@ -235,7 +235,7 @@ export class UploadService {
   /**
    * Upload profile image with specific transformations
    */
-  static async uploadProfileImage(file: Express.Multer.File, userId: number) {
+  static async uploadProfileImage(file: Express.Multer.File, userId: string) {
     return await this.uploadImage(file, {
       folder: 'etour/profiles',
       public_id: `profile_${userId}`,
