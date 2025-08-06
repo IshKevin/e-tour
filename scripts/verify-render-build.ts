@@ -49,7 +49,7 @@ try {
   
   // Just verify the file can be loaded without syntax errors
   try {
-    require('./dist/index.js');
+    require('../dist/index.js');
     console.log('   ❌ Server started (this should not happen in test)');
   } catch (error) {
     if (error.code === 'EADDRINUSE' || error.message.includes('listen EADDRINUSE')) {
