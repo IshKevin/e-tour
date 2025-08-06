@@ -5,6 +5,13 @@ import agentRoutes from './agent.routes';
 import adminRoutes from './admin.routes';
 import uploadRoutes from './upload.routes';
 import healthRoutes from './health.routes';
+import paymentRoutes from './payment.routes';
+import reviewRoutes from './review.routes';
+import wishlistRoutes from './wishlist.routes';
+import messagingRoutes from './messaging.routes';
+import promotionalRoutes from './promotional.routes';
+import contentRoutes from './content.routes';
+import systemRoutes from './system.routes';
 import { userController } from '../../controllers/user.controller';
 import { searchController } from '../../controllers/search.controller';
 import { tokenController } from '../../controllers/token.controller';
@@ -32,6 +39,27 @@ router.use('/upload', uploadRoutes);
 
 // Health routes
 router.use('/health', healthRoutes);
+
+// Payment routes
+router.use('/payments', paymentRoutes);
+
+// Review routes
+router.use('/', reviewRoutes);
+
+// Wishlist routes
+router.use('/wishlist', wishlistRoutes);
+
+// Messaging routes
+router.use('/messages', messagingRoutes);
+
+// Promotional routes
+router.use('/promotions', promotionalRoutes);
+
+// Content routes
+router.use('/content', contentRoutes);
+
+// System routes (utilities, notifications, analytics, monitoring)
+router.use('/', systemRoutes);
 
 // Profile routes (as specified in Task.md)
 router.get('/profile', authMiddleware, (req: Request, res: Response, next: NextFunction) => {
